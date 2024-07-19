@@ -3,11 +3,18 @@ from datetime import date
 
 
 class HeatmapEntryBase(BaseModel):
-    finished_date: date
+    date: date
+
+
+class HeatmapEntryDate(HeatmapEntryBase):
+    pass
+
+
+class HeatmapEntryCreate(HeatmapEntryBase):
+    pass
 
 
 class HeatmapEntry(HeatmapEntryBase):
-    user_id: int
     heatmap_id: int
 
 
@@ -20,10 +27,15 @@ class HeatmapCreate(HeatmapBase):
     pass
 
 
+class HeatmapChange(BaseModel):
+    title: str | None = None
+    description: str | None = None
+
+
 class Heatmap(HeatmapBase):
     id: int
     user_id: int
-    dates: list[HeatmapEntry] = []
+    entries: list[HeatmapEntry] = []
 
     class Config:
         orm_mode = True
