@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from sqlalchemy import Date
 from datetime import date
 
 

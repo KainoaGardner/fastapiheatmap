@@ -5,11 +5,11 @@ from sqlalchemy.orm import Session
 from ..database import models, schemas
 
 
-def get_all_entries(heatmap: schemas.Heatmap):
+def get_all_entries(heatmap: schemas.Heatmap) -> list:
     return heatmap.entries
 
 
-def get_user_heatmap(db: Session, user_id, heatmap_id):
+def get_user_heatmap(db: Session, user_id, heatmap_id) -> schemas.Heatmap:
     return (
         db.query(models.Heatmaps)
         .filter(models.Heatmaps.user_id == user_id, models.Heatmaps.id == heatmap_id)
@@ -17,7 +17,7 @@ def get_user_heatmap(db: Session, user_id, heatmap_id):
     )
 
 
-def get_heatmap_title(db: Session, user_id: int, heatmap_title: str):
+def get_heatmap_title(db: Session, user_id: int, heatmap_title: str) -> schemas.Heatmap:
     return (
         db.query(models.Heatmaps)
         .filter(
@@ -29,7 +29,7 @@ def get_heatmap_title(db: Session, user_id: int, heatmap_title: str):
 
 def change_heatmap(
     db: Session, db_heatmap: schemas.Heatmap, new_heatmap: schemas.HeatmapChange
-):
+) -> schemas.Heatmap:
     if new_heatmap.title:
         db_heatmap.title = new_heatmap.title
     if new_heatmap.description:
@@ -41,7 +41,9 @@ def change_heatmap(
     return db_heatmap
 
 
-def create_heatmap(db: Session, user_id: int, heatmap: schemas.HeatmapCreate):
+def create_heatmap(
+    db: Session, user_id: int, heatmap: schemas.HeatmapCreate
+) -> schemas.Heatmap:
     db_heatmap = models.Heatmaps(
         title=heatmap.title, description=heatmap.description, user_id=user_id
     )
@@ -51,7 +53,7 @@ def create_heatmap(db: Session, user_id: int, heatmap: schemas.HeatmapCreate):
     return db_heatmap
 
 
-def remove_heatmap(db: Session, user_id: int, heatmap_id: int):
+def remove_heatmap(db: Session, user_id: int, heatmap_id: int) -> schemas.Heatmap:
     heatmap = (
         db.query(models.Heatmaps)
         .filter(models.Heatmaps.id == heatmap_id, models.Heatmaps.user_id == user_id)
