@@ -1,8 +1,7 @@
-from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from ..database import models, schemas
+from ..password import verify_password, get_password_hash
 
 
 def get_user(db: Session, user_id: int) -> schemas.User:
@@ -26,8 +25,8 @@ def get_user_all_heatmaps(user: schemas.User) -> list:
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> schemas.User:
-    password = user.password  # HASH THIS PASSWORD
-    db_user = models.Users(username=user.username, password=user.password)
+    hashed_password = get_password_hash(user.password)
+    db_user = models.Users(username=user.username, password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -38,3 +37,13 @@ def remove_user(db: Session, db_user: schemas.User) -> schemas.User:
     db.delete(db_user)
     db.commit()
     return db_user
+
+
+def authenticate_user(db: Session, username: str, password: str):
+    user = db.query(models.Users).filter(models.Users.username == username).first()
+    if not user:
+        return False
+    if not verify_password(password, user.password):
+        return False
+    else:
+        return user
