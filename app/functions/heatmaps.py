@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 from ..database import models, schemas
 
 
-def get_all_entries(heatmap: schemas.Heatmap) -> list:
-    return heatmap.entries
+def get_user_all_heatmaps(user: schemas.User) -> list:
+    return user.heatmaps
 
 
 def get_user_heatmap(db: Session, user_id, heatmap_id) -> schemas.Heatmap:

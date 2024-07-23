@@ -1,56 +1,29 @@
-import jwt
-from datetime import datetime, timedelta, timezone
+from fastapi import HTTPException, APIRouter, Depends, status
 from typing import Annotated
-from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-# from jwt.exceptions import InvaliedTokenError
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta, timezone
 
-from .database.database import get_db
 from .database import schemas
-from .functions import users
+from .database.schemas import Token
+from .functions import users, authentication
+from .database.database import get_db
 
-from dotenv.main import load_dotenv
-import os
-
-
-load_dotenv()
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-def create_access_token(data: dict, expires_time: timedelta | None = None):
-    encode = data.copy()
-    if expires_time:
-        expire = datetime.now(timezone.utc) + expires_time
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(days=7)
-    encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+db_dependency = Annotated[Session, Depends(get_db)]
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-    try:
-        recived_data = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = recived_data.get("username")
-        if not username:
-            raise credentials_exception
-
-        token_data = TokenData(username=username)
-    except jwt.InvalidTokenError:
-        raise credentials_exception
-    Session = Depends(get_db)
-    user = users.get_user_username(Session, username)
+@router.post("/token", response_model=Token)
+def login_in_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
+):
+    user = users.authenticate_user(db, form_data.username, form_data.password)
     if not user:
-        raise credentials_exception
-    return user
+        raise HTTPException(status_code=401, detail="Could not validate user")
+    token = authentication.create_access_token(
+        user.username, user.id, timedelta(days=7)
+    )
+    return {"access_token": token, "token_type": "bearer"}

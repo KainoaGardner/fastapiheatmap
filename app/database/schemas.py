@@ -36,7 +36,7 @@ class HeatmapChange(BaseModel):
 class Heatmap(HeatmapBase):
     id: int
     user_id: int
-    entries: list[HeatmapEntry] = []
+    # entries: list[HeatmapEntry] = []
 
     class Config:
         orm_mode = True
@@ -56,7 +56,7 @@ class UserPassword(UserBase):
 
 class User(UserBase):
     id: int
-    heatmaps: list[Heatmap] = []
+    # heatmaps: list[Heatmap] = []
 
     class Config:
         orm_mode = True
@@ -65,7 +65,3 @@ class User(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None

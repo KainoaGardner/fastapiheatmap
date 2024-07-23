@@ -5,6 +5,10 @@ from datetime import date
 from ..database import models, schemas
 
 
+def get_all_entries(heatmap: schemas.Heatmap) -> list:
+    return heatmap.entries
+
+
 def check_today(
     db: Session, user_id: int, heatmap_id: int, date: date
 ) -> schemas.HeatmapEntry:

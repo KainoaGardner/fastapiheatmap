@@ -17,10 +17,6 @@ def get_all_users(db: Session) -> list:
     return db.query(models.Users).all()
 
 
-def get_user_all_heatmaps(user: schemas.User) -> list:
-    return user.heatmaps
-
-
 # def get_all_entries(heatmap_id: int, db: Session):
 #     pass
 
