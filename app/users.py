@@ -24,7 +24,7 @@ def get_user(user_auth: user_dependency, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.post("/create", response_model=schemas.User)
+@router.post("/create/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = users.get_user_username(db, user.username)
     if db_user:

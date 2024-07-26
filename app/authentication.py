@@ -16,7 +16,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-@router.post("/token", response_model=Token)
+@router.post("/token/", response_model=Token)
 def login_in_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
 ):

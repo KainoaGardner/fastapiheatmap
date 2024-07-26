@@ -12,12 +12,23 @@ from .database.database import get_db
 router = APIRouter(prefix="/heatmaps", tags=["Heatmaps"])
 
 
-@router.get("/{heatmap_id}", response_model=schemas.Heatmap)
+@router.get("/{heatmap_id}/", response_model=schemas.Heatmap)
 def get_user_heatmap(
     user_auth: user_dependency, heatmap_id: int, db: Session = Depends(get_db)
 ):
     user_id = user_auth["id"]
     db_heatmap = heatmaps.get_user_heatmap(db, user_id, heatmap_id)
+    if not db_heatmap:
+        raise HTTPException(status_code=404, detail="Heatmap not found")
+    return db_heatmap
+
+
+@router.get("/title/{heatmap_title}/", response_model=schemas.Heatmap)
+def get_heatmap_by_title(
+    user_auth: user_dependency, heatmap_title: str, db: Session = Depends(get_db)
+):
+    user_id = user_auth["id"]
+    db_heatmap = heatmaps.get_heatmap_title(db, user_id, heatmap_title)
     if not db_heatmap:
         raise HTTPException(status_code=404, detail="Heatmap not found")
     return db_heatmap
@@ -49,7 +60,7 @@ def create_heatmap(
     return heatmaps.create_heatmap(db, user_id, heatmap)
 
 
-@router.put("/change/{heatmap_id}", response_model=schemas.Heatmap)
+@router.put("/change/{heatmap_id}/", response_model=schemas.Heatmap)
 def change_heatmap(
     user_auth: user_dependency,
     heatmap_id: int,
@@ -64,13 +75,39 @@ def change_heatmap(
     return heatmaps.change_heatmap(db, db_heatmap, new_heatmap)
 
 
-@router.delete("/remove/{heatmap_id}", response_model=schemas.Heatmap)
+@router.put("/change/title/{heatmap_title}/", response_model=schemas.Heatmap)
+def change_heatmap(
+    user_auth: user_dependency,
+    heatmap_title: str,
+    new_heatmap: schemas.HeatmapChange,
+    db: Session = Depends(get_db),
+):
+
+    user_id = user_auth["id"]
+    db_heatmap = heatmaps.get_heatmap_title(db, user_id, heatmap_title)
+    if not db_heatmap:
+        raise HTTPException(status_code=404, detail="Heatmap not found")
+    return heatmaps.change_heatmap(db, db_heatmap, new_heatmap)
+
+
+@router.delete("/remove/{heatmap_id}/", response_model=schemas.Heatmap)
 def remove_heatmap(
     user_auth: user_dependency, heatmap_id: int, db: Session = Depends(get_db)
 ):
 
     user_id = user_auth["id"]
     db_heatmap = heatmaps.get_user_heatmap(db, user_id, heatmap_id)
+    if not db_heatmap:
+        raise HTTPException(status_code=404, detail="Heatmap not found")
+    return heatmaps.remove_heatmap(db, user_id, heatmap_id)
+
+
+@router.delete("/remove/title/{heatmap_title}/", response_model=schemas.Heatmap)
+def remove_heatmap(
+    user_auth: user_dependency, heatmap_title: int, db: Session = Depends(get_db)
+):
+    user_id = user_auth["id"]
+    db_heatmap = heatmaps.get_heatmap_title(db, user_id, heatmap_title)
     if not db_heatmap:
         raise HTTPException(status_code=404, detail="Heatmap not found")
     return heatmaps.remove_heatmap(db, user_id, heatmap_id)
