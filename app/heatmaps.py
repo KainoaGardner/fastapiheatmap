@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app import app
 from .database import models, schemas
-from .functions import users, heatmaps
+from .functions import users, heatmaps, entries
 from .functions.authentication import user_dependency
 from .database.database import get_db
 
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/heatmaps", tags=["Heatmaps"])
 
 @router.get("/{heatmap_id}/", response_model=schemas.Heatmap)
 def get_user_heatmap(
-    user_auth: user_dependency, heatmap_id: int, db: Session = Depends(get_db)
+    user_auth: user_dependency, heatmap_id: str, db: Session = Depends(get_db)
 ):
     user_id = user_auth["id"]
     db_heatmap = heatmaps.get_user_heatmap(db, user_id, heatmap_id)
@@ -41,6 +41,18 @@ def get_user_all_heatmaps(user_auth: user_dependency, db: Session = Depends(get_
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     return heatmaps.get_user_all_heatmaps(db_user)
+
+
+@router.get("/streak/{heatmap_title}/", response_model=list[schemas.HeatmapEntry])
+def get_heatmap_streak(
+    user_auth: user_dependency, heatmap_title: str, db: Session = Depends(get_db)
+):
+    user_id = user_auth["id"]
+    db_heatmap = heatmaps.get_heatmap_title(db, user_id, heatmap_title)
+    if not db_heatmap:
+        raise HTTPException(status_code=404, detail="Heatmap not found")
+    all_entries = entries.get_all_entries(db_heatmap)
+    return heatmaps.get_heatmap_streak(all_entries)
 
 
 @router.post("/create/", response_model=schemas.Heatmap)
@@ -104,7 +116,7 @@ def remove_heatmap(
 
 @router.delete("/remove/title/{heatmap_title}/", response_model=schemas.Heatmap)
 def remove_heatmap(
-    user_auth: user_dependency, heatmap_title: int, db: Session = Depends(get_db)
+    user_auth: user_dependency, heatmap_title: str, db: Session = Depends(get_db)
 ):
     user_id = user_auth["id"]
     db_heatmap = heatmaps.get_heatmap_title(db, user_id, heatmap_title)

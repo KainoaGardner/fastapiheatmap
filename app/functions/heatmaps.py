@@ -3,6 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from ..database import models, schemas
+from datetime import date, timedelta
 
 
 def get_user_all_heatmaps(user: schemas.User) -> list:
@@ -25,6 +26,20 @@ def get_heatmap_title(db: Session, user_id: int, heatmap_title: str) -> schemas.
         )
         .first()
     )
+
+
+def get_heatmap_streak(entries: list[schemas.HeatmapEntry]):
+    entry_dates = {}
+    for entry in entries:
+        entry_dates.update({entry.date: entry})
+
+    streak = []
+    check_day = date.today()
+    while check_day in entry_dates:
+        streak.append(entry_dates[check_day])
+        check_day = check_day - timedelta(days=1)
+
+    return streak
 
 
 def change_heatmap(
