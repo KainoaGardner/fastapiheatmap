@@ -68,12 +68,7 @@ def create_heatmap(
     return db_heatmap
 
 
-def remove_heatmap(db: Session, user_id: int, heatmap_id: int) -> schemas.Heatmap:
-    heatmap = (
-        db.query(models.Heatmaps)
-        .filter(models.Heatmaps.id == heatmap_id, models.Heatmaps.user_id == user_id)
-        .first()
-    )
+def remove_heatmap(db, heatmap) -> schemas.Heatmap:
     db.delete(heatmap)
     db.commit()
     return heatmap

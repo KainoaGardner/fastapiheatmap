@@ -7,14 +7,6 @@ class HeatmapEntryBase(BaseModel):
     date: date
 
 
-class HeatmapEntryDate(HeatmapEntryBase):
-    pass
-
-
-class HeatmapEntryCreate(HeatmapEntryBase):
-    pass
-
-
 class HeatmapEntry(HeatmapEntryBase):
     heatmap_id: int
 
