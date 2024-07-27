@@ -28,10 +28,8 @@ def remove_today(db: Session, db_entry) -> schemas.HeatmapEntry:
     return db_entry
 
 
-def create_entry(
-    db: Session, heatmap_id: int, new_entry: schemas.HeatmapEntryCreate
-) -> schemas.HeatmapEntry:
-    db_entry = models.HeatmapEntries(date=new_entry.date, heatmap_id=heatmap_id)
+def create_entry(db: Session, heatmap_id: int, date: date) -> schemas.HeatmapEntry:
+    db_entry = models.HeatmapEntries(date=date, heatmap_id=heatmap_id)
     db.add(db_entry)
     db.commit()
     db.refresh(db_entry)
