@@ -12,7 +12,7 @@ from .database.database import get_db
 router = APIRouter(prefix="/heatmaps", tags=["Heatmaps"])
 
 
-@router.get("/{heatmap}/", response_model=schemas.Heatmap)
+@router.get("/single/{heatmap}", response_model=schemas.Heatmap)
 def get_user_heatmap(
     user_auth: user_dependency,
     heatmap: str,
