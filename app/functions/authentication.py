@@ -3,16 +3,13 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 
 from dotenv.main import load_dotenv
 import os
 
-# from jwt.exceptions import InvaliedTokenError
 
 from ..database.database import get_db
-from ..database import schemas
-from . import users
 
 
 load_dotenv()

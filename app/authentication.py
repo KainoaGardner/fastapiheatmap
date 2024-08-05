@@ -1,11 +1,10 @@
-from fastapi import HTTPException, APIRouter, Depends, status
+from fastapi import HTTPException, APIRouter, Depends
 from typing import Annotated
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
-from .database import schemas
 from .database.schemas import Token
 from .functions import users, authentication
 from .database.database import get_db

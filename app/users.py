@@ -1,5 +1,6 @@
-from fastapi import HTTPException, status, APIRouter, Depends
+from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy.orm import Session
+from datetime import date
 
 from .database import schemas
 from .functions import users
@@ -22,6 +23,17 @@ def get_user(user_auth: user_dependency, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
+
+@router.get("/today/")
+def today(
+    user_auth: user_dependency, date: date = date.today(), db: Session = Depends(get_db)
+):
+    user_id = user_auth["id"]
+    db_user = users.get_user(db, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return users.today(db, db_user, date)
 
 
 @router.post("/create/", response_model=schemas.User)

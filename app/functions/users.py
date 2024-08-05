@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
+from datetime import date
 
 from ..database import models, schemas
+from .entries import check_today
 
 from ..password import verify_password, get_password_hash
 
@@ -17,8 +19,24 @@ def get_all_users(db: Session) -> list:
     return db.query(models.Users).all()
 
 
-# def get_all_entries(heatmap_id: int, db: Session):
-#     pass
+def today(db: Session, user: schemas.User, date: date) -> list:
+    heatmaps = user.heatmaps
+    result = []
+    for heatmap in heatmaps:
+        if check_today(db, user.id, heatmap.id, date):
+            finished = True
+        else:
+            finished = False
+        result.append(
+            {
+                "title": heatmap.title,
+                "heatmap_id": heatmap.id,
+                "description": heatmap.description,
+                "finished": finished,
+            }
+        )
+
+    return result
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> schemas.User:

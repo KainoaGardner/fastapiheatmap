@@ -1,9 +1,7 @@
-from fastapi import HTTPException, status, APIRouter, Depends
-from fastapi.encoders import jsonable_encoder
+from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app import app
-from .database import models, schemas
+from .database import schemas
 from .functions import users, heatmaps, entries
 from .functions.authentication import user_dependency
 from .database.database import get_db
